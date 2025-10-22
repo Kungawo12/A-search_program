@@ -1,21 +1,18 @@
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
-// Class DelivC does the work for deliverable DelivC of the Prog340
+// Class DelivD does the work for deliverable DelivD of the Prog340
 
-public class DelivC {
+public class DelivD {
 
 	File inputFile;
 	File outputFile;
 	PrintWriter output;
 	Graph g;
-	Graph gh;
 	
-	public DelivC( File in, Graph gr, Graph grh ) {
+	public DelivD( File in, Graph gr ) {
 		inputFile = in;
 		g = gr;
-		gh = grh;
 		
 		// Get output file name.
 		String inputFileName = inputFile.toString();
@@ -33,21 +30,10 @@ public class DelivC {
 			System.err.format("Exception: %s%n", x);
 			System.exit(0);
 		}
-		
-		ArrayList<Node> nodes = new ArrayList<>(g.getNodeList());
+		System.out.println( "DelivD:  To be implemented");
+		output.println( "DelivD:  To be implemented");
+		output.flush();
 	}
-
-	
-
-	private Node getNodeByName(String name){
-		for (int i = 0; i < nodes.size(); i++) {
-			Node currentNode = nodes.get(i);
-			if(name.equals(currentNode.getName()){
-				return currentNode;
-			}
-		}
-	}
-
 }
 
 
