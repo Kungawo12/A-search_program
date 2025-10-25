@@ -1,6 +1,6 @@
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.*;
 
 // Class DelivC does the work for deliverable DelivC of the Prog340
 
@@ -34,19 +34,100 @@ public class DelivC {
 			System.exit(0);
 		}
 		
-		ArrayList<Node> nodes = new ArrayList<>(g.getNodeList());
 	}
 
-	
+	private Node getNodebyVAl(String targetVal, ArrayList<Node> nodes){
+		// loop
+		for(Node node: nodes){
+			String nodeVal = node.getVal();
 
-	private Node getNodeByName(String name){
-		for (int i = 0; i < nodes.size(); i++) {
-			Node currentNode = nodes.get(i);
-			if(name.equals(currentNode.getName()){
-				return currentNode;
+			if(nodeVal != null && nodeVal.equals(targetVal)){
+				return node;
 			}
 		}
+		return null;
 	}
+
+	private int getActualDistance(Node fromCity, Node toCity){
+		ArrayList<Edge> outgoing = fromCity.getOutgoingEdges();
+
+		for(Edge edge: outgoing){
+			if(edge.getHead().equals(toCity)){
+				return edge.getDist();
+			}
+		}
+		return 0;
+	}
+
+	private int getHeuristic(Node fromCity, Node goalCity){
+		ArrayList<Edge> outgoing = fromCity.getOutgoingEdges();
+
+		for(Edge edge: outgoing){
+			if(edge.getHead().equals(goalCity)){
+				return edge.getDist();
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Represents one possible path from start to some city
+	 * Stores the sequence of cities visited and costs
+	 */
+	private class Path implements Comparable<Path>{
+		ArrayList<Node> nodes;
+		int d;
+		int h;
+		int f;
+
+		/**
+		* Constructor
+		* @param pathNodes - List of nodes in this path
+		* @param actualDist - Real distance we've traveled
+		* @param heuristic - Estimated distance to goal
+		*/
+
+		public Path(ArrayList<Node> pathNodes, int actualDist, int heuristic){
+			this.nodes = new ArrayList<>(pathNodes);
+			this.d = actualDist;
+			this.h = heuristic;
+			this.f = actualDist + heuristic;
+
+		}
+		/**
+    	 * Compare paths by f-value
+    	 * Lower f-value = higher priority (explored first)
+    	 */
+		@Override
+		public int compareTo(Path other){
+			return Integer.compare(this.f, other.f);
+		}
+
+		/**
+    	 * Get last node in path (current city)
+    	 */
+		public Node getLastNode(){
+			return nodes.get(nodes.size()-1);
+		}
+
+		/**
+    	 * Converting path to string
+		*/
+		public String getPathString(){
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < nodes.size(); i++) {
+				if(i > 0) sb.append("-");
+				sb.append(nodes.get(i).getAbbrev());
+			}
+			return sb.toString();
+		}
+	}
+
+		// A* Search Algorithm
+
+		private void AStarSearch(Node StartNode, Node goalNode, ArrayList<Node> allNodes){
+			
+		}
 
 }
 
