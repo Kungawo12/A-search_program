@@ -1,0 +1,19 @@
+Shortest Path from Minneapolis (Mpl) to Atlanta (Atl)
+
+PATH                 DIST     HEUR     F-VALUE 
+
+Mpl                  0        400      400     
+
+Mpl-Atl              400      0        400     
+Mpl-Chi              200      300      500     
+Mpl-Dal              400      400      800     
+Mpl-Was              500      300      800     
+Mpl-NY               500      400      900     
+Mpl-Den              300      600      900     
+Mpl-Mia              800      300      1100    
+Mpl-Bos              600      500      1100    
+Mpl-LA               800      1000     1800    
+Mpl-Sea              700      1100     1800    
+Mpl-SF               800      1100     1900    
+
+Mpl-Atl              400     
