@@ -33,24 +33,49 @@ public class DelivC {
 			System.err.format("Exception: %s%n", x);
 			System.exit(0);
 		}
-		
+
+		ArrayList<Node> nodes = new ArrayList<>(g.getNodeList());
+
+		//finding start and goal nodes
+		Node startNode = getNodebyVAl("S", nodes);
+		Node goalNode = getNodebyVAl("G", nodes);
+
+		if(startNode == null || goalNode == null){
+			System.out.println("Error: Start or Goal node not found!");
+			output.println("Error: Start or Goal node not found!");
+			output.close();
+			return;
+		}
+		AStarSearch(startNode, goalNode, nodes);
+
+		output.close();
 	}
 
-	private Node getNodebyVAl(String targetVal, ArrayList<Node> nodes){
+	/**
+	 * Finds a node by its value field (looking for "S" or "G")
+	 * @param val The value to search for
+	 * @param nodeList List of all nodes
+	 * @return The node with matching value, or null if not found
+	 */
+	private Node getNodebyVAl(String val, ArrayList<Node> nodeList){
 		// loop
-		for(Node node: nodes){
-			String nodeVal = node.getVal();
-
-			if(nodeVal != null && nodeVal.equals(targetVal)){
+		for(Node node: nodeList){
+			if (val.equals(node.getVal())) {
 				return node;
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * Gets the actual distance from one node to another
+	 * @param from Starting node
+	 * @param to Destination node
+	 * @return Actual distance, or 0 if no edge found
+	 */
+
 	private int getActualDistance(Node fromCity, Node toCity){
 		ArrayList<Edge> outgoing = fromCity.getOutgoingEdges();
-
 		for(Edge edge: outgoing){
 			if(edge.getHead().equals(toCity)){
 				return edge.getDist();
@@ -59,9 +84,15 @@ public class DelivC {
 		return 0;
 	}
 
+
+	/**
+	 * Gets the heuristic distance from one node to another
+	 * @param from Starting node
+	 * @param to Destination node
+	 * @return Heuristic distance, or 0 if no edge found
+	 */
 	private int getHeuristic(Node fromCity, Node goalCity){
 		ArrayList<Edge> outgoing = fromCity.getOutgoingEdges();
-
 		for(Edge edge: outgoing){
 			if(edge.getHead().equals(goalCity)){
 				return edge.getDist();
@@ -123,12 +154,120 @@ public class DelivC {
 		}
 	}
 
-		// A* Search Algorithm
+	/**
+     * Prints a line to BOTH console (System.out) AND output file
+     */
+	private void printlnBoth(String s) {
+        System.out.println(s);
+        output.println(s);
+    }
+	
+	// ===== HELPER METHOD 5: Print all paths in queue =====
+    /**
+     * Shows us what paths are waiting to be explored
+     */
+    private void printQueueStatus(PriorityQueue<Path> queue) {
+        // Convert queue to list (can't iterate queue directly)
+        List<Path> pathsList = new ArrayList<>(queue);
+        
+        // Sort by f-value
+        Collections.sort(pathsList);
+        
+        // Print each path with formatted columns
+        for (Path path : pathsList) {
+            String pathStr = path.getPathString();
+            String output = String.format("%-20s %-8d %-8d %-8d", 
+                pathStr, path.d, path.h, path.f);
+            printlnBoth(output);
+        }
+    }
 
-		private void AStarSearch(Node StartNode, Node goalNode, ArrayList<Node> allNodes){
-			
-		}
+		/**
+		 * Performs A* search from start to goal
+		 * @param startNode The starting city
+		 * @param goalNode The goal city
+		 * @param allNodes List of all nodes in the graph
+		 */
 
+		private void AStarSearch(Node startNode, Node goalNode, ArrayList<Node> allNodes){
+			PriorityQueue<Path> openQueue = new PriorityQueue<>();
+			Set<Node> closedSet = new HashSet<>();
+			Map<Node,Integer> bestDistTo = new HashMap<>();
+
+			//Creating initial path
+			ArrayList<Node> startPath = new ArrayList<>();
+			startPath.add(startNode);
+
+			//calculate heuristic from start to goal
+			int startHeuristic = getHeuristic(startNode, goalNode);
+
+			//creating first path and add to queue
+			Path initialPath = new Path(startPath,0,startHeuristic);
+			openQueue.add(initialPath);
+			bestDistTo.put(startNode, 0);
+
+			// printing output
+			String header = "Shortest Path from " + startNode.getName() + 
+			" (" + startNode.getAbbrev() + 
+			") to " + goalNode.getName() + 
+			" (" + goalNode.getAbbrev() + ")";
+			printlnBoth(header);
+			printlnBoth("");
+			printlnBoth(String.format("%-20s %-8s %-8s %-8s","PATH", "DIST", "HEUR", "F-VALUE"));
+			printlnBoth("");
+			printQueueStatus(openQueue);
+		
+			//main loop
+			while(!openQueue.isEmpty()){
+				Path currentPath = openQueue.poll();
+				Node lastNode = currentPath.getLastNode();
+
+				if(lastNode.equals(goalNode)){
+					printlnBoth("");
+					String pathStr = currentPath.getPathString();
+					String output = String.format("%-20s %-8d", pathStr, currentPath.d);
+					printlnBoth(output);
+					return;
+				}
+
+				if(closedSet.contains(lastNode)){
+					continue;
+				}
+
+				closedSet.add(lastNode);
+
+				//looking at neighbors
+				ArrayList<Edge> outgoing = lastNode.getOutgoingEdges();
+				for (Edge edge: outgoing){
+					Node neighbor = edge.getHead();
+					int edgeDist = edge.getDist();
+					int distToNeighbor = currentPath.d + edgeDist;
+
+					if (!bestDistTo.containsKey(neighbor) || distToNeighbor < bestDistTo.get(neighbor)) {
+						bestDistTo.put(neighbor, distToNeighbor);
+						ArrayList newPathNodes = new ArrayList<>(currentPath.nodes);
+						newPathNodes.add(neighbor);
+
+						// Get heuristic distance from neighbor to goal
+						int heuristic = getHeuristic(neighbor, goalNode);
+						Path newPath = new Path(newPathNodes, distToNeighbor, heuristic);
+						openQueue.add(newPath);
+					}
+				}
+				if (!openQueue.isEmpty()) {
+						printlnBoth("");
+						printQueueStatus(openQueue);
+					}
+				}
+				
+				// If we get here, no path was found
+				printlnBoth("No path found from " + startNode.getAbbrev() + " to " + goalNode.getAbbrev());
+	}
 }
+	
+		
+
+
+
 
 
