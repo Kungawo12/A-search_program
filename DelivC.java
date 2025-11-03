@@ -162,10 +162,7 @@ public class DelivC {
         output.println(s);
     }
 	
-	// ===== HELPER METHOD 5: Print all paths in queue =====
-    /**
-     * Shows us what paths are waiting to be explored
-     */
+	
     private void printQueueStatus(PriorityQueue<Path> queue) {
         // Convert queue to list (can't iterate queue directly)
         List<Path> pathsList = new ArrayList<>(queue);
