@@ -36,7 +36,7 @@ public class DelivC {
 
 		ArrayList<Node> nodes = new ArrayList<>(g.getNodeList());
 
-		//finding start and goal nodes
+		//finding start node 'S' and goal nodes "G"
 		Node startNode = getNodebyVAl("S", nodes);
 		Node goalNode = getNodebyVAl("G", nodes);
 
@@ -155,13 +155,15 @@ public class DelivC {
 	}
 
 	/**
-     * Prints a line to BOTH console (System.out) AND output file
+     * Prints a string to BOTH console output and output file
      */
 	private void printlnBoth(String s) {
         System.out.println(s);
         output.println(s);
     }
-	
+	/**
+     * Prints the current state of the priority queue
+     */
 	
     private void printQueueStatus(PriorityQueue<Path> queue) {
         // Convert queue to list (can't iterate queue directly)
